@@ -39,7 +39,6 @@ export function convertToCytoscapeFormat(data: Array<{ V: number[][], E: number[
                 y: position[1]
             }
         };
-        console.log(node);
         cyElements.push(node);
     });
 

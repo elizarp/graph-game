@@ -72,8 +72,13 @@ function checkForOverlappingEdges(cy) {
     }
   }
   if (win) {
-    nextPhase();
-    return;
+    let elems = cy.elements();
+    elems.forEach(element => {
+      element.style('background-color', '#8FE3E8');
+      element.style('line-color', '#8FE3E8');
+      element.style('border-color', '#8FE3E8');
+    });
+    nextPhaseDisabled = false; 
   }
 }
 
@@ -160,11 +165,13 @@ const jsonData = [
 		"E": [[0, 6], [6, 1], [12, 8], [8, 13], [0, 3], [3, 1], [12, 10], [10, 13], [2, 3], [3, 4], [9, 10], [10, 11], [2, 8], [8, 4], [9, 6], [6, 11], [5, 6], [6, 7], [5, 8], [7, 8], [0, 2], [9, 12], [1, 4], [11, 13], [4, 2], [9, 11], [0, 1], [12, 13], [5, 9], [4, 7]]
 	}
 ];
-let CYTOSCAPE_ELEMENTS: CytoscapeElement[] = convertToCytoscapeFormat(jsonData, 1);
+let graphIndex = 0;
 if (typeof window !== "undefined") {
-  let graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
-  let CYTOSCAPE_ELEMENTS: CytoscapeElement[] = convertToCytoscapeFormat(jsonData, graphIndex);
+  graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
 }
+console.log(graphIndex);
+let CYTOSCAPE_ELEMENTS: CytoscapeElement[] = convertToCytoscapeFormat(jsonData, graphIndex);
+
 function nextPhase(){
   let graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
   graphIndex++;
@@ -178,11 +185,13 @@ function resetPhase(){
   window.location.reload();
 }
 
+let nextPhaseDisabled = true;
 
 export default function Home() {
   const [nodeShape, setNodeShape] = useState("");
 
   let myCyRef;
+  
   const cyClick = (evt) => {     // runs many times
     myCyRef.add({
       group: 'nodes',
@@ -195,14 +204,15 @@ export default function Home() {
     });
   };
   const [width, setWith] = useState("100%");
-  const [height, setHeight] = useState("400px");
+  const [height, setHeight] = useState("600px");
   //Adding elements here
   
   return (
     <>
       <div>
         <h1>Graph Game</h1>
-        <button value="Reset" onClick={resetPhase}>Reset</button>
+        <button value="Reset" onClick={resetPhase}>Reset</button> | 
+        <button value="Next Phase" onClick={nextPhase}>Next Phase</button>
         <div
           style={{
             border: "1px solid",
@@ -227,6 +237,9 @@ export default function Home() {
 
 
               cy.on('mousedown', evt => {
+                checkForOverlappingEdges(cy);
+              });
+              cy.on('mouseup', evt => {
                 checkForOverlappingEdges(cy);
               });
             }}
