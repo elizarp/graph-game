@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 
-export function Timer({ expiryTimestamp, resetTimer }) {
+export function Timer({expiryTimestamp}: any) {
     const {
-        totalSeconds,
+        //totalSeconds,
         seconds,
         minutes,
-        hours,
-        days,
-        isRunning,
-        start,
-        pause,
-        resume,
+        //hours,
+        //days,
+        //isRunning,
+        //start,
+        //pause,
+        //resume,
         restart,
     } = useTimer({ 
         expiryTimestamp: expiryTimestamp.getTime(), 

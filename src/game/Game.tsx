@@ -1,26 +1,26 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { CytoscapeElement, convertToCytoscapeFormat } from './Custom'; // Importe os tipos definidos
-import LogoImg from '../assets/img/logo.jpeg';
+//import LogoImg from '../assets/img/logo.jpeg';
 import { ForwardIconSolid, ArrowPathIconSolid, PlayIconSolid } from '@neo4j-ndl/react/icons';
 import { Timer } from './Timer';
 
-import { Button, Typography, Widget } from '@neo4j-ndl/react';
+import { Button, Typography } from '@neo4j-ndl/react';
 
 // Dark mode featured images
-import StarterKitImgDark from '../assets/img/template/StarterKitImg-dark.png';
-import EcommerceImgDark from '../assets/img/template/EcommerceImg-dark.png';
-import MovieImgDark from '../assets/img/template/MovieImg-dark.png';
-import CyberSecurityImgDark from '../assets/img/template/CyberSecurityImg-dark.png';
+//import StarterKitImgDark from '../assets/img/template/StarterKitImg-dark.png';
+//import EcommerceImgDark from '../assets/img/template/EcommerceImg-dark.png';
+//import MovieImgDark from '../assets/img/template/MovieImg-dark.png';
+//import CyberSecurityImgDark from '../assets/img/template/CyberSecurityImg-dark.png';
 
 // Light mode featured images
-import StarterKitImgLight from '../assets/img/template/StarterKitImg-light.png';
-import EcommerceImgLight from '../assets/img/template/EcommerceImg-light.png';
-import MovieImgLight from '../assets/img/template/MovieImg-light.png';
-import CyberSecurityImgLight from '../assets/img/template/CyberSecurityImg-light.png';
+//import StarterKitImgLight from '../assets/img/template/StarterKitImg-light.png';
+//import EcommerceImgLight from '../assets/img/template/EcommerceImg-light.png';
+//import MovieImgLight from '../assets/img/template/MovieImg-light.png';
+//import CyberSecurityImgLight from '../assets/img/template/CyberSecurityImg-light.png';
 
-import { useContext } from 'react';
-import { ThemeWrapperContext } from '../context/ThemeWrapper';
+//import { useContext } from 'react';
+//import { ThemeWrapperContext } from '../context/ThemeWrapper';
 
 //////
 function onSegment(p: { x: number; y: number; }, q: { x: number; y: number; }, r: { x: number; y: number; }) {
@@ -168,7 +168,7 @@ function nextPhase() {
 }
 
 
-let nextPhaseDisabled = true;
+//let nextPhaseDisabled = true;
 //////
 
 export default function Games() {
@@ -212,51 +212,13 @@ export default function Games() {
       setNextPhaseDisabled(false);
     }
   }
-  const { colorMode } = useContext(ThemeWrapperContext);
+  // const { colorMode } = useContext(ThemeWrapperContext);
 
-  const templatesCards = [
-    {
-      title: 'Foundation Template',
-      description:
-        'The Foundation template, because we all starts somewhere, this was the first template we created, combining simple, modern and UX all together for a generic application design.',
-      image: colorMode === 'dark' ? StarterKitImgDark : StarterKitImgLight,
-      sourceCode: `https://github.com/neo4j-labs/neo4j-needle-starterkit/blob/${import.meta.env.PACKAGE_VERSION
-        }/src/templates/foundation`,
-      previewLink: '/foundation-preview',
-    },
-    {
-      title: 'Cyber security',
-      description:
-        'Explore your network infrastructure and retrieve impact analysis in one click! This templates facilitate the visualization and analysis of complex infrastructures.',
-      image: colorMode === 'dark' ? CyberSecurityImgDark : CyberSecurityImgLight,
-      sourceCode: `https://github.com/neo4j-labs/neo4j-needle-starterkit/blob/${import.meta.env.PACKAGE_VERSION
-        }/src/templates/cybersecurity`,
-      previewLink: '/cybersecurity-preview',
-    },
-    {
-      title: 'Movie Recommendation',
-      description: 'Simple and modern movie recommendation template based on the famous Neo4j movie dataset.',
-      image: colorMode === 'dark' ? MovieImgDark : MovieImgLight,
-      sourceCode: `https://github.com/neo4j-labs/neo4j-needle-starterkit/blob/${import.meta.env.PACKAGE_VERSION
-        }/src/templates/movie`,
-      previewLink: '/movie-preview',
-    },
-    {
-      title: 'Ecommerce',
-      description:
-        'E-commerce product page with a modern and clean design. Perfect for having one featured product followed by suggestions on recommended products and packages/frequently bought together.',
-      image: colorMode === 'dark' ? EcommerceImgDark : EcommerceImgLight,
-      sourceCode: `https://github.com/neo4j-labs/neo4j-needle-starterkit/blob/${import.meta.env.PACKAGE_VERSION
-        }/src/templates/ecommerce`,
-      previewLink: '/ecommerce-preview',
-    },
-  ];
+  //const [nodeShape, setNodeShape] = useState("");
 
-  const [nodeShape, setNodeShape] = useState("");
+  //let myCyRef: { add?: any; on?: (arg0: string, arg1: { (evt: any): void; (evt: any): void; }) => void; };
 
-  let myCyRef: { add?: any; on?: (arg0: string, arg1: { (evt: any): void; (evt: any): void; }) => void; };
-
-  const cyClick = (evt: { position: { x: any; y: any; }; }) => {     // runs many times
+  /*const cyClick = (evt: { position: { x: any; y: any; }; }) => {     // runs many times
     myCyRef.add({
       group: 'nodes',
       data: { weight: 75 },
@@ -266,9 +228,7 @@ export default function Games() {
       },
       style: { 'shape': nodeShape }
     });
-  };
-  const [width, setWith] = useState("100%");
-  const [height, setHeight] = useState("600px");
+  };*/
   const [expiryTimestamp, setExpiryTimestamp] = useState(new Date());
   
   const resetTimer = useCallback(() => {
@@ -312,13 +272,10 @@ export default function Games() {
             //nodeDimensionsIncludeLabels: false
           }}
           cy={cy => {
-            myCyRef = cy;
-
-
-            cy.on('mousedown', evt => {
+            cy.on('mousedown', () => {
               checkForOverlappingEdges(cy);
             });
-            cy.on('mouseup', evt => {
+            cy.on('mouseup', () => {
               checkForOverlappingEdges(cy);
             });
           }}
