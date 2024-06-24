@@ -354,6 +354,9 @@ export default function Games() {
             cy.on('mouseup', () => {
               checkForOverlappingEdges(cy);
             });
+            cy.on('touchend', () => {
+              checkForOverlappingEdges(cy);
+            });
           }}
         />
       </div>
