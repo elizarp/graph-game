@@ -20,9 +20,9 @@ export default function StartModal({
   getUserName,
   message,
 }: StartModalProps) {
-  const [userName, setUserName] = useState<string>('userName');
-  const [userCompany, setUserCompany] = useState<string>('userCompany');
-  const [userEmail, setuserEmail] = useState<string>('userEmail');
+  const [userName, setUserName] = useState<string>('');
+  const [userCompany, setUserCompany] = useState<string>('');
+  const [userEmail, setuserEmail] = useState<string>('');
 
   const [startMessage, setMessage] = useState<Message | null>(null);
 
@@ -33,7 +33,15 @@ export default function StartModal({
     try {
 
 
-      let isSuccessful = true;
+      let isSuccessful = (userName && userCompany && userEmail);
+      if (!isSuccessful){
+        setMessage({
+          type: 'danger',
+          content: 'Please type your data!',
+        });
+        return;
+      }
+
       const { uri, user, password } = JSON.parse(localStorage.getItem('neo4j-connection') ?? '') ?? {};
       setDriver(uri, user, password);
 
@@ -81,6 +89,7 @@ export default function StartModal({
                 label='Name'
                 placeholder='<type your name>'
                 fluid
+                required
                 onChange={(e) => setUserName(e.target.value)}
               />
             </div>
@@ -92,6 +101,7 @@ export default function StartModal({
                 label='Company'
                 placeholder='<type your company>'
                 fluid
+                required
                 onChange={(e) => setUserCompany(e.target.value)}
               />
             </div>
@@ -101,8 +111,10 @@ export default function StartModal({
                 value={userEmail}
                 disabled={false}
                 label='Email'
+                type='email'
                 placeholder='<type your email>'
                 fluid
+                required
                 onChange={(e) => setuserEmail(e.target.value)}
               />
             </div>

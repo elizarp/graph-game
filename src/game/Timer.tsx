@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 
-export function Timer({expiryTimestamp}: any) {
+interface TimerProps {
+    expiryTimestamp: any;
+    setTimerExpired: (arg: boolean) => void;
+    resetTimer: () => void;
+  }
+
+export function Timer({expiryTimestamp,setTimerExpired}: TimerProps) {
     const {
         //totalSeconds,
         seconds,
@@ -15,7 +21,11 @@ export function Timer({expiryTimestamp}: any) {
         restart,
     } = useTimer({ 
         expiryTimestamp: expiryTimestamp.getTime(), 
-        onExpire: () => console.warn('onExpire called') });
+        onExpire: () => {
+            console.warn('onExpire called');
+            setTimerExpired(true);
+        }
+    });
 
     useEffect(() => {
         restart(expiryTimestamp.getTime());

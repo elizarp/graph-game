@@ -5,24 +5,11 @@ import { CytoscapeElement, convertToCytoscapeFormat } from './Custom'; // Import
 import { ForwardIconSolid, ArrowPathIconSolid, PlayIconSolid } from '@neo4j-ndl/react/icons';
 import { Timer } from './Timer';
 
-import { Button, Typography } from '@neo4j-ndl/react';
+import { Banner, Button, Label, Typography } from '@neo4j-ndl/react';
 import StartModal from '../shared/StartModal';
-//import { runRecoQuery, setDriver } from '../shared/utils/Driver';
+import { Core } from 'cytoscape';
+import { execQuery, setDriver } from '../shared/utils/Driver';
 
-// Dark mode featured images
-//import StarterKitImgDark from '../assets/img/template/StarterKitImg-dark.png';
-//import EcommerceImgDark from '../assets/img/template/EcommerceImg-dark.png';
-//import MovieImgDark from '../assets/img/template/MovieImg-dark.png';
-//import CyberSecurityImgDark from '../assets/img/template/CyberSecurityImg-dark.png';
-
-// Light mode featured images
-//import StarterKitImgLight from '../assets/img/template/StarterKitImg-light.png';
-//import EcommerceImgLight from '../assets/img/template/EcommerceImg-light.png';
-//import MovieImgLight from '../assets/img/template/MovieImg-light.png';
-//import CyberSecurityImgLight from '../assets/img/template/CyberSecurityImg-light.png';
-
-//import { useContext } from 'react';
-//import { ThemeWrapperContext } from '../context/ThemeWrapper';
 
 //////
 function onSegment(p: { x: number; y: number; }, q: { x: number; y: number; }, r: { x: number; y: number; }) {
@@ -161,29 +148,55 @@ if (typeof window !== "undefined") {
 console.log(graphIndex);
 let CYTOSCAPE_ELEMENTS: CytoscapeElement[] = convertToCytoscapeFormat(jsonData, graphIndex);
 
-function nextPhase() {
-  let graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
-  graphIndex++;
-  window.localStorage.setItem("graphIndex", graphIndex.toString());
-  CYTOSCAPE_ELEMENTS = convertToCytoscapeFormat(jsonData, graphIndex);
-  //console.log(graphIndex);
-  //window.location.reload();
+
+
+
+interface Message {
+  type: 'success' | 'info' | 'warning' | 'danger' | 'neutral';
+  content: string;
 }
-
-
-
 
 export default function Games() {
   const [nextPhaseDisabled, setNextPhaseDisabled] = useState(true);
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
-
+  const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
+  const [timerExpired, setTimerExpired] = useState(false);
+  const [message, setMessage] = useState<Message | null>(null);;
+    
   useEffect(() => {
     if (userName) {
-      alert("resetou");
       resetTimer();
+      myCyRef.nodes().grabify();
+    } else{
+      myCyRef.nodes().ungrabify();
     }
   }, [userName]);
+
+  useEffect(() => {
+    if (userName && timerExpired) {
+      myCyRef.elements().remove();
+      setMessage({
+        type: 'danger',
+        content: `Game over!!! Level: ${graphIndex}`,
+      });
+    }
+  }, [timerExpired]);
+
+  useEffect(() => {
+    if (!init) {
+      let session = localStorage.getItem('neo4j-connection');
+      if (session) {
+        let neo4jConnection = JSON.parse(session);
+        setDriver(neo4jConnection.uri, neo4jConnection.user, neo4jConnection.password).then((isSuccessful: boolean) => {
+          setConnectionStatus(isSuccessful);
+        });
+      }
+
+      setInit(true);
+    }
+  });
 
   function resetPhase() {
     window.localStorage.setItem("graphIndex", "0");
@@ -205,14 +218,14 @@ export default function Games() {
 
         if (doIntersect({ x: p1.x, y: p1.y, id: edge1.source().id() }, { x: q1.x, y: q1.y, id: edge1.target().id() },
           { x: p2.x, y: p2.y, id: edge2.source().id() }, { x: q2.x, y: q2.y, id: edge2.target().id() })) {
-          console.log('Overlapping edges found:', edge1.id(), edge2.id(), edge1.source().id(), edge1.target().id(), edge2.source().id(), edge2.target().id());
+          //console.log('Overlapping edges found:', edge1.id(), edge2.id(), edge1.source().id(), edge1.target().id(), edge2.source().id(), edge2.target().id());
           win = false;
           break;
           // Handle overlapping case
         }
       }
     }
-    console.log(win);
+    //console.log(win);
     if (win) {
       let elems = cy.elements();
       elems.forEach((element: { style: (arg0: string, arg1: string) => void; }) => {
@@ -227,13 +240,42 @@ export default function Games() {
   const [expiryTimestamp, setExpiryTimestamp] = useState(new Date());
 
   const resetTimer = useCallback(() => {
+    setTimerExpired(false);
     const newTime = new Date();
-    newTime.setMinutes(newTime.getMinutes() + 5); // Adicione 5 minutos ao tempo atual
+    newTime.setSeconds(newTime.getSeconds() + 20); // Adicione 20 segundos ao tempo atual
     setExpiryTimestamp(newTime);
   }, []);
 
   function start(): void {
+    myCyRef.nodes().grabify();
     setIsStartModalOpen(true);
+  }
+
+  let myCyRef: Core;
+
+  function nextPhase() {
+    graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
+    graphIndex++;
+    window.localStorage.setItem("graphIndex", graphIndex.toString());
+    CYTOSCAPE_ELEMENTS = convertToCytoscapeFormat(jsonData, graphIndex);
+    //console.log(graphIndex);
+    myCyRef.elements().remove();
+    myCyRef.add(CYTOSCAPE_ELEMENTS);
+    setNextPhaseDisabled(true);
+
+    const { uri, user, password } = JSON.parse(localStorage.getItem('neo4j-connection') ?? '') ?? {};
+    setDriver(uri, user, password);
+
+    (async () => {
+      const query = `MERGE (p:Person {id:'${userName}'}) SET p.level = ${graphIndex}  RETURN p`;
+      const results = await execQuery(query);
+      console.log(query);
+      console.log(results);
+      if (!results) {
+        console.error('Failed to retrieve results.');
+      }
+    })();
+    //window.location.reload();
   }
 
   return (
@@ -241,21 +283,28 @@ export default function Games() {
       <Typography variant='h2' className='flex p-5 justify-center'>
         Graph Game
       </Typography>
-      <Typography variant='body-large' className='flex p-5 justify-center'>
-        <Timer expiryTimestamp={expiryTimestamp} resetTimer={resetTimer} />
-      </Typography>
       <div className='Footer w-full flex content-center justify-center'>
         <Button onClick={resetPhase} className="mr-4">
-          <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Reset Phase
+          <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Restart
         </Button>
-
         <Button onClick={start} className="mr-4">
           <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
         </Button>
-
         <Button onClick={nextPhase} disabled={nextPhaseDisabled}>
           <ForwardIconSolid className='n-w-6 n-h-6' /> &emsp; Next Phase
         </Button>
+      </div>
+      <Typography variant='body-large' className='flex p-5 justify-center'>
+        <Timer expiryTimestamp={expiryTimestamp} setTimerExpired={setTimerExpired} resetTimer={resetTimer} />
+      </Typography>
+      {userName?( 
+      <Typography variant='h3' className='flex p-5 justify-center'>
+        User name: {userName} |  Level: {graphIndex}
+      </Typography>
+    
+      ):("")}
+      <div>
+        {message && <Banner type={message.type}>{message.content}</Banner>}
       </div>
       <div className='flex flex-wrap justify-center items-center gap-x-14 gap-y-10'>
         <CytoscapeComponent
@@ -271,7 +320,10 @@ export default function Games() {
             //nodeDimensionsIncludeLabels: false
           }}
           panningEnabled={false}
+          id='myCy'
           cy={cy => {
+            myCyRef = cy;
+            
             cy.on('mousedown', () => {
               checkForOverlappingEdges(cy);
             });
@@ -286,7 +338,12 @@ export default function Games() {
         setOpenStart={setIsStartModalOpen}
         getUserName={setUserName}
       />
-      User Name: {userName}
+      <Typography variant='body-medium' className='flex p-5'>
+        Neo4j connection Status:
+        <Typography variant='body-medium' className='ml-2.5'>
+          {!connectionStatus ? <Label color='danger'>Not connected</Label> : <Label color='success'>Connected</Label>}
+        </Typography>
+      </Typography>
     </div>
   );
 }
