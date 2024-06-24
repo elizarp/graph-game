@@ -2,10 +2,12 @@ import { useState, useCallback, useEffect } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { CytoscapeElement, convertToCytoscapeFormat } from './Custom'; // Importe os tipos definidos
 //import LogoImg from '../assets/img/logo.jpeg';
+import imgHelp from '../assets/img/graph-game-help.gif';
+
 import { ForwardIconSolid, ArrowPathIconSolid, PlayIconSolid } from '@neo4j-ndl/react/icons';
 import { Timer } from './Timer';
 
-import { Banner, Button, Label, Typography } from '@neo4j-ndl/react';
+import { Banner, Button, Dialog, Label, Typography } from '@neo4j-ndl/react';
 import StartModal from '../shared/StartModal';
 import { Core } from 'cytoscape';
 import { execQuery, setDriver } from '../shared/utils/Driver';
@@ -141,6 +143,7 @@ const jsonData = [
     "E": [[0, 6], [6, 1], [12, 8], [8, 13], [0, 3], [3, 1], [12, 10], [10, 13], [2, 3], [3, 4], [9, 10], [10, 11], [2, 8], [8, 4], [9, 6], [6, 11], [5, 6], [6, 7], [5, 8], [7, 8], [0, 2], [9, 12], [1, 4], [11, 13], [4, 2], [9, 11], [0, 1], [12, 13], [5, 9], [4, 7]]
   }
 ];
+
 let graphIndex = 0;
 if (typeof window !== "undefined") {
   graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
@@ -165,23 +168,22 @@ export default function Games() {
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
   const [timerExpired, setTimerExpired] = useState(false);
-  const [message, setMessage] = useState<Message | null>(null);;
-    
+  const [message, setMessage] = useState<Message | null>(null);
+  const [openHelp, setOpenHelp] = useState<boolean>(true);
+
   useEffect(() => {
     if (userName) {
       resetTimer();
       myCyRef.nodes().grabify();
       setStartDisabled(true);
-    } else{
+    } else {
       myCyRef.nodes().ungrabify();
     }
   }, [userName]);
 
   useEffect(() => {
     if (userName && timerExpired) {
-      myCyRef.elements().remove();
-      setNextPhaseDisabled(true);
-      setStartDisabled(true);
+      blockGraph();
       setMessage({
         type: 'danger',
         content: `Game over!!! Level achieved: ${graphIndex}`,
@@ -206,6 +208,10 @@ export default function Games() {
   function resetPhase() {
     window.localStorage.setItem("graphIndex", "0");
     window.location.reload();
+  }
+
+  const toogleOpenHelp = () => {
+    setOpenHelp(!openHelp);
   }
 
   function checkForOverlappingEdges(cy: { edges: () => any; elements: () => any; }) {
@@ -238,7 +244,13 @@ export default function Games() {
         element.style('line-color', '#8FE3E8');
         element.style('border-color', '#8FE3E8');
       });
-      setNextPhaseDisabled(false);
+      if (!timerExpired) {
+        setMessage({
+          type: 'success',
+          content: `Great!!!`,
+        });
+        setNextPhaseDisabled(false);
+      }
     }
   }
 
@@ -252,14 +264,24 @@ export default function Games() {
   }, []);
 
   function start(): void {
+    setOpenHelp(false);
     myCyRef.nodes().grabify();
     setIsStartModalOpen(true);
   }
 
   let myCyRef: Core;
 
+  function blockGraph() {
+    myCyRef.elements().remove();
+    setNextPhaseDisabled(true);
+  }
+
   function nextPhase() {
-    graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
+    if (timerExpired || !userName) {
+      blockGraph();
+      return;
+    }
+    graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "-1");
     graphIndex++;
     window.localStorage.setItem("graphIndex", graphIndex.toString());
     CYTOSCAPE_ELEMENTS = convertToCytoscapeFormat(jsonData, graphIndex);
@@ -267,6 +289,7 @@ export default function Games() {
     myCyRef.elements().remove();
     myCyRef.add(CYTOSCAPE_ELEMENTS);
     setNextPhaseDisabled(true);
+    setMessage(null);
 
     const { uri, user, password } = JSON.parse(localStorage.getItem('neo4j-connection') ?? '') ?? {};
     setDriver(uri, user, password);
@@ -289,11 +312,11 @@ export default function Games() {
         Graph Game
       </Typography>
       <div className='Footer w-full flex content-center justify-center'>
-      {startDisabled?( 
-        <Button onClick={resetPhase} className="mr-4">
-          <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Restart
-        </Button>
-      ):("")}
+        {startDisabled ? (
+          <Button onClick={resetPhase} className="mr-4">
+            <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Restart
+          </Button>
+        ) : ("")}
         <Button onClick={start} className="mr-4" disabled={startDisabled}>
           <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
         </Button>
@@ -304,19 +327,13 @@ export default function Games() {
       <Typography variant='body-large' className='flex p-5 justify-center'>
         <Timer expiryTimestamp={expiryTimestamp} setTimerExpired={setTimerExpired} resetTimer={resetTimer} />
       </Typography>
-      {userName?( 
-      <Typography variant='h3' className='flex p-5 justify-center'>
-        User name: {userName} |  Level: {graphIndex}
-      </Typography>
-    
-      ):("")}
       <div>
         {message && <Banner type={message.type}>{message.content}</Banner>}
       </div>
       <div className='flex flex-wrap justify-center items-center gap-x-14 gap-y-10'>
         <CytoscapeComponent
           elements={CYTOSCAPE_ELEMENTS}
-          style={{ width: '600px', height: '600px' }}
+          style={{ width: '600px', height: '400px', paddingLeft:'20%' }}
           layout={{
             name: 'preset',
             //directed: false,
@@ -330,7 +347,7 @@ export default function Games() {
           id='myCy'
           cy={cy => {
             myCyRef = cy;
-            
+
             cy.on('mousedown', () => {
               checkForOverlappingEdges(cy);
             });
@@ -340,6 +357,12 @@ export default function Games() {
           }}
         />
       </div>
+      {userName ? (
+        <Typography variant='h3' className='flex p-5 justify-center'>
+          User name: {userName} |  Level: {graphIndex}
+        </Typography>
+
+      ) : ("")}
       <StartModal
         open={isStartModalOpen}
         setOpenStart={setIsStartModalOpen}
@@ -351,6 +374,30 @@ export default function Games() {
           {!connectionStatus ? <Label color='danger'>Not connected</Label> : <Label color='success'>Connected</Label>}
         </Typography>
       </Typography>
+      <Dialog size='medium' open={openHelp} aria-labelledby='form-dialog-title' onClose={toogleOpenHelp}>
+        <Dialog.Header id='form-dialog-title'>Welcome</Dialog.Header>
+        <Dialog.Content className='n-flex n-flex-col n-gap-token-4 justify-center'>
+          <div>Welcome to the Graph Game, developed by Neo4j!</div>
+
+          <div>The objective of the game is to complete as many levels as possible in 2 minutes. </div>
+
+          <div>Arrange the graph so that its relationships do not intersect, following the example below:</div>
+          <div>
+            <img src={imgHelp} alt="Help" />
+          </div>
+          <div>Click on [Start] and have fun!!!</div>
+          <div className='flex flex-wrap justify-center items-center'>
+            <Button onClick={start} className="mr-4" disabled={startDisabled}>
+              <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
+            </Button>
+          </div>
+          
+          <Typography variant='body-small' className='ml-2.5'>Based on https://treksit.com (R.I.P.) </Typography>
+        </Dialog.Content>
+      </Dialog>
     </div>
+
   );
 }
+
+

@@ -1,18 +1,19 @@
 import { MoonIconOutline, SunIconOutline, QuestionMarkCircleIconOutline } from '@neo4j-ndl/react/icons';
-import { Typography, IconButton, Tabs, Switch, Logo } from '@neo4j-ndl/react';
+import { Typography, IconButton, Tabs, Switch, Logo, Dialog } from '@neo4j-ndl/react';
 import React, { useState } from 'react';
 import { ThemeWrapperContext } from '../context/ThemeWrapper';
 import User from './User';
+import imgHelp from '../assets/img/graph-game-help.gif';
 
 export default function Header({
   title,
   navItems = [],
   activeNavItem = navItems[0],
-  setActiveNavItem = () => {},
+  setActiveNavItem = () => { },
   useNeo4jConnect = false,
   connectNeo4j = false,
-  setConnectNeo4j = () => {},
-  openConnectionModal = () => {},
+  setConnectNeo4j = () => { },
+  openConnectionModal = () => { },
   userHeader = true,
 }: {
   title: string;
@@ -27,6 +28,7 @@ export default function Header({
 }) {
   const themeUtils = React.useContext(ThemeWrapperContext);
   const [themeMode, setThemeMode] = useState<string>(themeUtils.colorMode);
+  const [openHelp, setOpenHelp] = useState<boolean>(false);
 
   const toggleColorMode = () => {
     setThemeMode((prevThemeMode) => {
@@ -34,6 +36,10 @@ export default function Header({
     });
     themeUtils.toggleColorMode();
   };
+
+  const toogleOpenHelp = () => {
+    setOpenHelp(!openHelp);
+  }
 
   return (
     <div className='n-bg-palette-neutral-bg-weak p-1 border-b-2 border-[rgb(var(--theme-palette-neutral-border-weak))] h-16'>
@@ -97,7 +103,7 @@ export default function Header({
                   </span>
                 )}
               </IconButton>
-              <IconButton className='hidden md:inline-flex' aria-label='Help' clean size='large'>
+              <IconButton className='hidden md:inline-flex' aria-label='Help' clean size='large' onClick={toogleOpenHelp}>
                 <QuestionMarkCircleIconOutline />
               </IconButton>
 
@@ -106,6 +112,20 @@ export default function Header({
                   <User />
                 </div>
               ) : null}
+              <Dialog size='small' open={openHelp} aria-labelledby='form-dialog-title' onClose={toogleOpenHelp}>
+                <Dialog.Header id='form-dialog-title'>GraphGame - Help</Dialog.Header>
+                <Dialog.Content className='n-flex n-flex-col n-gap-token-4'>
+                  <div>Welcome to the Graph Game, developed by Neo4j!</div>
+
+                  <div>The objective of the game is to complete as many levels as possible in 2 minutes. </div>
+
+                  <div>Arrange the graph so that its relationships do not intersect, following the example below:</div>
+                  <div>
+                    <img src={imgHelp} alt="Help" />
+                  </div>
+                  <Typography variant='body-small' className='ml-2.5'>Based on https://treksit.com (R.I.P.) </Typography>
+                </Dialog.Content>
+              </Dialog>
             </div>
           </div>
         </section>
