@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { CytoscapeElement, convertToCytoscapeFormat } from './Custom'; // Importe os tipos definidos
 //import LogoImg from '../assets/img/logo.jpeg';
@@ -6,6 +6,8 @@ import { ForwardIconSolid, ArrowPathIconSolid, PlayIconSolid } from '@neo4j-ndl/
 import { Timer } from './Timer';
 
 import { Button, Typography } from '@neo4j-ndl/react';
+import StartModal from '../shared/StartModal';
+//import { runRecoQuery, setDriver } from '../shared/utils/Driver';
 
 // Dark mode featured images
 //import StarterKitImgDark from '../assets/img/template/StarterKitImg-dark.png';
@@ -163,16 +165,23 @@ function nextPhase() {
   let graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
   graphIndex++;
   window.localStorage.setItem("graphIndex", graphIndex.toString());
-  console.log(graphIndex);
-  window.location.reload();
+  CYTOSCAPE_ELEMENTS = convertToCytoscapeFormat(jsonData, graphIndex);
+  //console.log(graphIndex);
+  //window.location.reload();
 }
 
 
-//let nextPhaseDisabled = true;
-//////
+
 
 export default function Games() {
   const [nextPhaseDisabled, setNextPhaseDisabled] = useState(true);
+  const [isStartModalOpen, setIsStartModalOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+  
+  useEffect(() => {
+    //createUser(userName,userCompany,userEmail);
+    //alert(localStorage.getItem('userName'));
+  }, [userName]); 
  
   function resetPhase() {
     window.localStorage.setItem("graphIndex", "0");
@@ -212,23 +221,7 @@ export default function Games() {
       setNextPhaseDisabled(false);
     }
   }
-  // const { colorMode } = useContext(ThemeWrapperContext);
-
-  //const [nodeShape, setNodeShape] = useState("");
-
-  //let myCyRef: { add?: any; on?: (arg0: string, arg1: { (evt: any): void; (evt: any): void; }) => void; };
-
-  /*const cyClick = (evt: { position: { x: any; y: any; }; }) => {     // runs many times
-    myCyRef.add({
-      group: 'nodes',
-      data: { weight: 75 },
-      position: {
-        x: evt.position.x,
-        y: evt.position.y
-      },
-      style: { 'shape': nodeShape }
-    });
-  };*/
+  
   const [expiryTimestamp, setExpiryTimestamp] = useState(new Date());
   
   const resetTimer = useCallback(() => {
@@ -236,6 +229,10 @@ export default function Games() {
     newTime.setMinutes(newTime.getMinutes() + 5); // Adicione 5 minutos ao tempo atual
     setExpiryTimestamp(newTime);
   }, []);
+
+  function start():void {
+    setIsStartModalOpen(true);
+  }
 
   return (
     <div className='flex flex-col items-center'>
@@ -250,7 +247,7 @@ export default function Games() {
           <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Reset Phase
         </Button>
 
-        <Button onClick={resetTimer} className="mr-4">
+        <Button onClick={start} className="mr-4">
           <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
         </Button>
 
@@ -267,10 +264,11 @@ export default function Games() {
             //directed: false,
             padding: 40,
             animate: true,
-            animationDuration: 1000,
+            animationDuration: 1000
             ///avoidOverlap: true,
             //nodeDimensionsIncludeLabels: false
           }}
+          panningEnabled={false}
           cy={cy => {
             cy.on('mousedown', () => {
               checkForOverlappingEdges(cy);
@@ -281,6 +279,12 @@ export default function Games() {
           }}
         />
       </div>
+      <StartModal
+        open={isStartModalOpen}
+        setOpenStart={setIsStartModalOpen}
+        getUserName={setUserName}
+      />
+      User Name: {userName}
     </div>
   );
 }

@@ -1,4 +1,4 @@
 {
-    "appService.defaultWebAppToDeploy": "/subscriptions/0e4d7860-f619-460d-9ebb-3275136c06ec/resourceGroups/eliezer-events/providers/Microsoft.Web/sites/app-events-graph-game",
+    "appService.defaultWebAppToDeploy": "/subscriptions/ce9075ee-355d-47b0-8e90-e2d3e925b0e5/resourceGroups/latam-events/providers/Microsoft.Web/sites/app-events-graph-game",
     "appService.deploySubpath": "."
 }
