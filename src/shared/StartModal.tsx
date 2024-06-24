@@ -47,7 +47,7 @@ export default function StartModal({
 
       // Call the runRecoQuery function with a query string
       (async () => {
-        const query = `MERGE (p:Person {id:'${userName}'}) SET p.name = '${userName}', p.email = '${userEmail}', p.company = '${userCompany}'  RETURN p`;
+        const query = `MERGE (p:Person {id:'${userName}'}) SET p.name = '${userName}', p.email = '${userEmail}', p.company = '${userCompany}', p.level = 0  RETURN p`;
         const results = await execQuery(query);
         console.log(query);
         console.log(results);

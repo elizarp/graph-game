@@ -59,7 +59,7 @@ export default function Ranking() {
   async function getRankingQuery(): Promise<void> {
     // Call the runRecoQuery function with a query string
     (async () => {
-      const query = 'MATCH (p:Person) RETURN p.id as id, p.name as name, p.level as level'; // Example query
+      const query = 'MATCH (p:Person) RETURN p.id as id, p.name as name, p.level as level ORDER BY p.level DESC'; // Example query
       const results = await runRecoQuery(query);
       if (results) {
         rankingData = [];

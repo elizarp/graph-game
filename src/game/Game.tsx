@@ -158,6 +158,8 @@ interface Message {
 
 export default function Games() {
   const [nextPhaseDisabled, setNextPhaseDisabled] = useState(true);
+  const [startDisabled, setStartDisabled] = useState(false);
+
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
@@ -169,6 +171,7 @@ export default function Games() {
     if (userName) {
       resetTimer();
       myCyRef.nodes().grabify();
+      setStartDisabled(true);
     } else{
       myCyRef.nodes().ungrabify();
     }
@@ -177,9 +180,11 @@ export default function Games() {
   useEffect(() => {
     if (userName && timerExpired) {
       myCyRef.elements().remove();
+      setNextPhaseDisabled(true);
+      setStartDisabled(true);
       setMessage({
         type: 'danger',
-        content: `Game over!!! Level: ${graphIndex}`,
+        content: `Game over!!! Level achieved: ${graphIndex}`,
       });
     }
   }, [timerExpired]);
@@ -284,10 +289,12 @@ export default function Games() {
         Graph Game
       </Typography>
       <div className='Footer w-full flex content-center justify-center'>
+      {startDisabled?( 
         <Button onClick={resetPhase} className="mr-4">
           <ArrowPathIconSolid className='n-w-6 n-h-6' /> &emsp; Restart
         </Button>
-        <Button onClick={start} className="mr-4">
+      ):("")}
+        <Button onClick={start} className="mr-4" disabled={startDisabled}>
           <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
         </Button>
         <Button onClick={nextPhase} disabled={nextPhaseDisabled}>
