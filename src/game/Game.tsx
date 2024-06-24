@@ -247,7 +247,7 @@ export default function Games() {
   const resetTimer = useCallback(() => {
     setTimerExpired(false);
     const newTime = new Date();
-    newTime.setSeconds(newTime.getSeconds() + 20); // Adicione 20 segundos ao tempo atual
+    newTime.setSeconds(newTime.getSeconds() + 120); // Adicione 120 segundos ao tempo atual
     setExpiryTimestamp(newTime);
   }, []);
 
