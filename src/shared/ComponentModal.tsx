@@ -22,10 +22,10 @@ export default function ConnectionModal({
 }: ConnectionModalProps) {
   const protocols = ['neo4j', 'neo4j+s', 'neo4j+ssc', 'bolt', 'bolt+s', 'bolt+ssc'];
   const [protocol, setProtocol] = useState<string>('neo4j+s');
-  const [URI, setURI] = useState<string>('localhost');
+  const [URI, setURI] = useState<string>('fd026fe7.databases.neo4j.io');
   const [port, setPort] = useState<number>(7687);
   const [database, setDatabase] = useState<string>('neo4j');
-  const [username, setUsername] = useState<string>('neo4j');
+  const [username, setUsername] = useState<string>('febraban');
   const [password, setPassword] = useState<string>('password');
   const [connectionMessage, setMessage] = useState<Message | null>(null);
 

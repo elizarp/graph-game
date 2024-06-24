@@ -62,7 +62,7 @@ export default function Ranking() {
       const query = 'MATCH (p:Person) RETURN p.id as id, p.name as name, p.level as level'; // Example query
       const results = await runRecoQuery(query);
       if (results) {
-
+        rankingData = [];
         results.forEach((result, index) => {
           console.log(`Result ${index}: ${result.id}`);
           let newItem: RankingItem = { id: result.id,  name: result.name, level: parseInt(result.level) }

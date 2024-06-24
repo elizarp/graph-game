@@ -177,12 +177,14 @@ export default function Games() {
   const [nextPhaseDisabled, setNextPhaseDisabled] = useState(true);
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
-  
+
   useEffect(() => {
-    //createUser(userName,userCompany,userEmail);
-    //alert(localStorage.getItem('userName'));
-  }, [userName]); 
- 
+    if (userName) {
+      alert("resetou");
+      resetTimer();
+    }
+  }, [userName]);
+
   function resetPhase() {
     window.localStorage.setItem("graphIndex", "0");
     window.location.reload();
@@ -221,16 +223,16 @@ export default function Games() {
       setNextPhaseDisabled(false);
     }
   }
-  
+
   const [expiryTimestamp, setExpiryTimestamp] = useState(new Date());
-  
+
   const resetTimer = useCallback(() => {
     const newTime = new Date();
     newTime.setMinutes(newTime.getMinutes() + 5); // Adicione 5 minutos ao tempo atual
     setExpiryTimestamp(newTime);
   }, []);
 
-  function start():void {
+  function start(): void {
     setIsStartModalOpen(true);
   }
 
