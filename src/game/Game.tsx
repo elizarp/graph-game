@@ -9,7 +9,7 @@ import { Timer } from './Timer';
 
 import { Banner, Button, Dialog, Label, Typography } from '@neo4j-ndl/react';
 import StartModal from '../shared/StartModal';
-import { Core } from 'cytoscape';
+import { Core, EventObject } from 'cytoscape';
 import { execQuery, setDriver } from '../shared/utils/Driver';
 
 
@@ -170,6 +170,7 @@ export default function Games() {
   const [timerExpired, setTimerExpired] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const [openHelp, setOpenHelp] = useState<boolean>(true);
+  const [gameEnded, setGameEnded] = useState<boolean>(false);
 
   useEffect(() => {
     if (userName) {
@@ -184,6 +185,7 @@ export default function Games() {
   useEffect(() => {
     if (userName && timerExpired) {
       blockGraph();
+      setGameEnded(true);
       setMessage({
         type: 'danger',
         content: `Game over!!! Level achieved: ${graphIndex}`,
@@ -215,6 +217,10 @@ export default function Games() {
   }
 
   function checkForOverlappingEdges(cy: { edges: () => any; elements: () => any; }) {
+    console.log(`gameEnded: ${gameEnded}`);
+    console.log(`timerExpired: ${timerExpired}`);
+    if(gameEnded) return;
+
     let edges = cy.edges();
     let win = true;
     for (let i = 0; i < edges.length; i++) {
@@ -244,13 +250,12 @@ export default function Games() {
         element.style('line-color', '#8FE3E8');
         element.style('border-color', '#8FE3E8');
       });
-      if (!timerExpired) {
-        setMessage({
-          type: 'success',
-          content: `Great!!!`,
-        });
-        setNextPhaseDisabled(false);
-      }
+
+      setMessage({
+        type: 'success',
+        content: `Great!!!`,
+      });
+      setNextPhaseDisabled(false);
     }
   }
 
@@ -272,12 +277,14 @@ export default function Games() {
   let myCyRef: Core;
 
   function blockGraph() {
+    myCyRef.nodes().ungrabify();
     myCyRef.elements().remove();
+    myCyRef.destroy();
     setNextPhaseDisabled(true);
   }
 
   function nextPhase() {
-    if (timerExpired || !userName) {
+    if (timerExpired || !userName || gameEnded) {
       blockGraph();
       return;
     }
@@ -304,6 +311,18 @@ export default function Games() {
       }
     })();
     //window.location.reload();
+  }
+
+  function barrier(cy: Core, e: EventObject) {
+    let tg = e.target;
+    if (tg.group != undefined && tg.group() == 'nodes') {
+        let w = cy.width();
+        let h = cy.height();
+        if (tg.position().x > w) tg.position().x = w;
+        if (tg.position().x < 0) tg.position().x = 0;
+        if (tg.position().y > h) tg.position().y = h;
+        if (tg.position().y < 0) tg.position().y = 0;
+    }
   }
 
   return (
@@ -333,7 +352,7 @@ export default function Games() {
       <div className='flex flex-wrap justify-center items-center gap-x-14 gap-y-10'>
         <CytoscapeComponent
           elements={CYTOSCAPE_ELEMENTS}
-          style={{ width: '600px', height: '400px', paddingLeft:'20%' }}
+          style={{ width: '600px', height: '400px', paddingLeft: '20%' }}
           layout={{
             name: 'preset',
             //directed: false,
@@ -348,13 +367,16 @@ export default function Games() {
           cy={cy => {
             myCyRef = cy;
 
-            cy.on('mousedown', () => {
+            cy.on('mousedown', (e) => {
+              barrier(cy, e);
               checkForOverlappingEdges(cy);
             });
-            cy.on('mouseup', () => {
+            cy.on('mouseup', (e) => {
+              barrier(cy, e);
               checkForOverlappingEdges(cy);
             });
-            cy.on('touchend', () => {
+            cy.on('touchend', (e) => {
+              barrier(cy, e);
               checkForOverlappingEdges(cy);
             });
           }}
@@ -388,13 +410,14 @@ export default function Games() {
           <div>
             <img src={imgHelp} alt="Help" />
           </div>
+          <div>The objective of the game is to complete as many levels as possible in 2 minutes. </div>
           <div>Click on [Start] and have fun!!!</div>
           <div className='flex flex-wrap justify-center items-center'>
             <Button onClick={start} className="mr-4" disabled={startDisabled}>
               <PlayIconSolid className='n-w-6 n-h-6' /> &emsp; Start
             </Button>
           </div>
-          
+
           <Typography variant='body-small' className='ml-2.5'>Based on https://treksit.com (R.I.P.) </Typography>
         </Dialog.Content>
       </Dialog>
