@@ -49,8 +49,6 @@ export default function StartModal({
       (async () => {
         const query = `MERGE (p:Person {id:'${userName}'}) SET p.name = '${userName}', p.email = '${userEmail}', p.company = '${userCompany}', p.level = 0  RETURN p`;
         const results = await execQuery(query);
-        console.log(query);
-        console.log(results);
         if (results) {
           localStorage.setItem('userName', userName);
         } else {
@@ -72,9 +70,12 @@ export default function StartModal({
     }
   }
 
+  function userClose(){
+    setOpenStart(false);
+  }
   return (
     <>
-      <Dialog size='small' open={open} aria-labelledby='form-dialog-title'>
+      <Dialog size='small' open={open} aria-labelledby='form-dialog-title' onClose={userClose}>
         <Dialog.Header id='form-dialog-title'>User Data</Dialog.Header>
         <Dialog.Content className='n-flex n-flex-col n-gap-token-4'>
           {message && <Banner type={message.type}>{message.content}</Banner>}

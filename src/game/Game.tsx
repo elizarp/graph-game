@@ -148,11 +148,7 @@ let graphIndex = 0;
 if (typeof window !== "undefined") {
   graphIndex = parseInt(window.localStorage.getItem("graphIndex") || "0");
 }
-console.log(graphIndex);
 let CYTOSCAPE_ELEMENTS: CytoscapeElement[] = convertToCytoscapeFormat(jsonData, graphIndex);
-
-
-
 
 interface Message {
   type: 'success' | 'info' | 'warning' | 'danger' | 'neutral';
@@ -217,8 +213,6 @@ export default function Games() {
   }
 
   function checkForOverlappingEdges(cy: { edges: () => any; elements: () => any; }) {
-    console.log(`gameEnded: ${gameEnded}`);
-    console.log(`timerExpired: ${timerExpired}`);
     if(gameEnded) return;
 
     let edges = cy.edges();
@@ -242,7 +236,7 @@ export default function Games() {
         }
       }
     }
-    //console.log(win);
+    
     if (win) {
       let elems = cy.elements();
       elems.forEach((element: { style: (arg0: string, arg1: string) => void; }) => {
@@ -270,7 +264,7 @@ export default function Games() {
 
   function start(): void {
     setOpenHelp(false);
-    myCyRef.nodes().grabify();
+    //myCyRef.nodes().grabify();
     setIsStartModalOpen(true);
   }
 
@@ -292,7 +286,7 @@ export default function Games() {
     graphIndex++;
     window.localStorage.setItem("graphIndex", graphIndex.toString());
     CYTOSCAPE_ELEMENTS = convertToCytoscapeFormat(jsonData, graphIndex);
-    //console.log(graphIndex);
+    
     myCyRef.elements().remove();
     myCyRef.add(CYTOSCAPE_ELEMENTS);
     setNextPhaseDisabled(true);
@@ -304,8 +298,6 @@ export default function Games() {
     (async () => {
       const query = `MERGE (p:Person {id:'${userName}'}) SET p.level = ${graphIndex}  RETURN p`;
       const results = await execQuery(query);
-      console.log(query);
-      console.log(results);
       if (!results) {
         console.error('Failed to retrieve results.');
       }
