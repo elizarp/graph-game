@@ -115,7 +115,7 @@ export default function Header({
               <Dialog size='small' open={openHelp} aria-labelledby='form-dialog-title' onClose={toogleOpenHelp}>
                 <Dialog.Header id='form-dialog-title'>GraphGame - Help</Dialog.Header>
                 <Dialog.Content className='n-flex n-flex-col n-gap-token-4'>
-                  <div>Welcome to the Graph Game, developed by Neo4j!</div>
+                  <div>Welcome to the Graph Game, developed by Neo4j community!</div>
 
                   <div>The objective of the game is to complete as many levels as possible in 2 minutes. </div>
 

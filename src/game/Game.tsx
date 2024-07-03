@@ -394,7 +394,7 @@ export default function Games() {
       <Dialog size='medium' open={openHelp} aria-labelledby='form-dialog-title' onClose={toogleOpenHelp}>
         <Dialog.Header id='form-dialog-title'>Welcome</Dialog.Header>
         <Dialog.Content className='n-flex n-flex-col n-gap-token-4 justify-center'>
-          <div>Welcome to the Graph Game, developed by Neo4j!</div>
+          <div>Welcome to the Graph Game, developed by Neo4j community!</div>
 
           <div>The objective of the game is to complete as many levels as possible in 2 minutes. </div>
 
