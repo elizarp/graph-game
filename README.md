@@ -5,6 +5,8 @@ Welcome to the Graph Game, developed by Neo4j community!
 ## Game Objective
 The objective of the game is to complete as many levels as possible in 2 minutes. Arrange the graph so that its relationships do not intersect, following the example below.
 
+![Gif example](https://raw.githubusercontent.com/elizarp/graph-game/main/src/assets/img/graph-game-help.gif)
+
 ## Installation:
 ```shell
 yarn install
