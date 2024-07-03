@@ -1,17 +1,9 @@
-# Neo4j Needle StarterKit
-![Header](docs/modules/ROOT/images/FeaturedImg.jpg)
+# Graph Game
 
-Reactjs Responsive Starter Kit for building applications using [Neo4j Needle](https://www.neo4j.design/) for accelerating TTV.
-You can access the [online version here](https://needle-starterkit.graphapp.io).
+Welcome to the Graph Game, developed by Neo4j! 
 
-## Features
-- 📈 Various templates and components focused on uses-cases and industries
-- 🚀 Responsive: Adapts to different screen sizes for optimal user experience.
-- 🌚 Dark/Light Mode Theme 🌞: Includes a theme wrapper to switch between light and dark modes without having to reinvent the wheel!
-- ⚙️ Neo4j Integration: A simple example for connecting to a Neo4j database.
-- 🔐 Neo4j Auto-connect: Automatically connects to the Neo4j database if the user has a session saved (using localStorage).
-- 🛠️️ Modular approach: Facilitates easy customization.
-
+## Game Objective
+The objective of the game is to complete as many levels as possible in 2 minutes. Arrange the graph so that its relationships do not intersect, following the example below.
 
 ## Installation:
 ```shell
@@ -19,11 +11,26 @@ yarn install
 yarn run dev
 ```
 
-## Documentation
+## How to Play
+Click on [link](https://proud-forest-04aaa370f.5.azurestaticapps.net/) or run locally:
+1. Connect to a running Neo4j database
+2. Click on the [Start] button.
+3. Arrange the nodes of the graph by dragging them, ensuring that no edges (relationships) intersect.
+4. Complete as many levels as you can within the 2-minute time limit.
 
-The full documentation of every templates and components is available [here](https://neo4j.com/labs/neo4j-needle-starterkit/)
+## Tips
+- Plan your moves to minimize the intersections efficiently.
+- Use the given example as a guide to understand how a non-intersecting graph should look.
 
-## What it looks like
-### Desktop
-![Desktop](/docs/modules/ROOT/images/Templates.png)
-![Desktop](/docs/modules/ROOT/images/Components.png)
+## Enjoy the Game!
+Have fun and challenge yourself to improve your score each time you play!
+
+## Help
+If you need further assistance, feel free to reach out to authors.
+
+## Contributing
+We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md) for more information on how to get started.
+
+## Authors
+
+Eliézer Zarpelão - eliezer.zarpelao@neo4j.com
